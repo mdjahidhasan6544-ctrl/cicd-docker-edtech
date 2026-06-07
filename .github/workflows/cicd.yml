@@ -194,11 +194,25 @@ jobs:
           echo "::notice::docker login ok on EC2"
 
           # ---- 5) Pull + recreate the stack ----
+          # --force-recreate ensures containers are destroyed and recreated
+          # even if Docker thinks the image digest is unchanged (e.g. cached
+          # :latest on the EC2 host). Without it, a stale container can keep
+          # serving the previous image after a push.
           "${SSH[@]}" 'cd ~/app && docker compose pull'
           echo "::notice::docker compose pull ok on EC2"
 
-          "${SSH[@]}" 'cd ~/app && docker compose up -d --remove-orphans'
-          echo "::notice::docker compose up -d ok on EC2"
+          "${SSH[@]}" 'cd ~/app && docker compose up -d --remove-orphans --force-recreate'
+          echo "::notice::docker compose up -d --force-recreate ok on EC2"
 
-          # ---- 6) Clean up + show status ----
+          # ---- 6) Verify the running frontend image is the freshly-pushed one ----
+          # This catches the case where the EC2 host kept running an old container.
+          FRONTEND_IMAGE=$("${SSH[@]}" 'docker inspect mern-frontend --format "{{.Image}}"')
+          echo "::notice::mern-frontend image id on EC2: ${FRONTEND_IMAGE}"
+
+          # ---- 7) Verify the frontend actually serves content ----
+          "${SSH[@]}" 'curl -fsS http://localhost/ | head -c 400'
+          echo
+          echo "::notice::frontend HTTP probe ok on EC2"
+
+          # ---- 8) Clean up + show status ----
           "${SSH[@]}" 'docker image prune -f && docker compose -f ~/app/docker-compose.yml ps'
