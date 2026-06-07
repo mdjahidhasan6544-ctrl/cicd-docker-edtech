@@ -140,66 +140,65 @@ jobs:
           target: "~/app"
           command_timeout: 2m
 
-      # ---- SSH into EC2, generate .env, pull & restart ----
+      # ---- Deploy on EC2 via native ssh/rsync/scp (full control over logs) ----
+      # This step does everything in one shell so every command's stdout/stderr
+      # is visible in the GitHub Actions log, with set -x tracing the failing line.
       - name: Deploy application on EC2
-        uses: appleboy/ssh-action@v1
         env:
           EC2_HOST:        ${{ secrets.EC2_HOST }}
+          EC2_USER:        ${{ secrets.EC2_USER }}
+          EC2_SSH_KEY:     ${{ secrets.EC2_SSH_KEY }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           ADMIN_EMAIL:     ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
           MONGO_URI:       ${{ secrets.MONGO_URI }}
           JWT_SECRET:      ${{ secrets.JWT_SECRET }}
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          command_timeout: 10m
-          script: |
-            set -euo pipefail
-            # -x prints every command before it runs, so the failing
-            # line is obvious in the GH Actions log.
-            set -x
-            cd ~/app
+        run: |
+          set -euo pipefail
+          set -x
 
-            # 0) Sanity checks — fail with a clear message if prerequisites are missing
-            if ! command -v docker >/dev/null 2>&1; then
-              echo "::error::docker is not installed on the EC2 host"
-              exit 1
-            fi
-            if ! docker compose version >/dev/null 2>&1; then
-              echo "::error::'docker compose' (v2 plugin) is not available on the EC2 host"
-              exit 1
-            fi
+          # ---- 1) Materialize SSH key with strict perms ----
+          mkdir -p ~/.ssh
+          printf '%s' "${EC2_SSH_KEY}" > ~/.ssh/ec2_key
+          chmod 600 ~/.ssh/ec2_key
+          ssh-keyscan -H "${EC2_HOST}" >> ~/.ssh/known_hosts 2>/dev/null
 
-            # 1) Dynamically generate the .env file with secrets injected by GitHub Actions.
-            #    GitHub auto-masks known secret values in the runner log.
-            #    CLIENT_URL defaults to the EC2 host's public URL so CORS allows the browser origin.
-            cat > .env <<EOF
-            DOCKER_USERNAME=${DOCKER_USERNAME}
-            ADMIN_EMAIL=${ADMIN_EMAIL}
-            ADMIN_PASSWORD=${ADMIN_PASSWORD}
-            MONGO_URI=${MONGO_URI}
-            JWT_SECRET=${JWT_SECRET}
-            CLIENT_URL=http://${EC2_HOST}
-            ADMIN_NAME=Scholastica Admin
-            EOF
+          SSH=(ssh -i ~/.ssh/ec2_key -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=~/.ssh/known_hosts "${EC2_USER}@${EC2_HOST}")
 
-            # Tighten permissions on the .env (contains secrets)
-            chmod 600 .env
+          # ---- 2) Sanity checks (clear error if docker / plugin missing) ----
+          if ! "${SSH[@]}" 'command -v docker >/dev/null 2>&1'; then
+            echo "::error::docker is not installed on the EC2 host"
+            exit 1
+          fi
+          if ! "${SSH[@]}" 'docker compose version >/dev/null 2>&1'; then
+            echo "::error::'docker compose' (v2 plugin) is not available on the EC2 host"
+            exit 1
+          fi
 
-            # 2) Log in to Docker Hub on the EC2 host
-            echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+          # ---- 3) Generate .env on EC2 (with strict perms) ----
+          "${SSH[@]}" "cd ~/app && cat > .env <<EOF
+          DOCKER_USERNAME=${DOCKER_USERNAME}
+          ADMIN_EMAIL=${ADMIN_EMAIL}
+          ADMIN_PASSWORD=${ADMIN_PASSWORD}
+          MONGO_URI=${MONGO_URI}
+          JWT_SECRET=${JWT_SECRET}
+          CLIENT_URL=http://${EC2_HOST}
+          ADMIN_NAME=Scholastica Admin
+          EOF
+          chmod 600 .env"
+          echo "::notice::.env written on EC2"
 
-            # 3) Pull the latest images
-            docker compose pull
+          # ---- 4) Docker login on EC2 ----
+          "${SSH[@]}" "echo '${DOCKER_PASSWORD}' | docker login -u '${DOCKER_USERNAME}' --password-stdin"
+          echo "::notice::docker login ok on EC2"
 
-            # 4) Recreate the stack
-            docker compose up -d --remove-orphans
+          # ---- 5) Pull + recreate the stack ----
+          "${SSH[@]}" 'cd ~/app && docker compose pull'
+          echo "::notice::docker compose pull ok on EC2"
 
-            # 5) Clean up dangling images to free disk space
-            docker image prune -f
+          "${SSH[@]}" 'cd ~/app && docker compose up -d --remove-orphans'
+          echo "::notice::docker compose up -d ok on EC2"
 
-            # 6) Show a quick status snapshot
-            docker compose ps
+          # ---- 6) Clean up + show status ----
+          "${SSH[@]}" 'docker image prune -f && docker compose -f ~/app/docker-compose.yml ps'
