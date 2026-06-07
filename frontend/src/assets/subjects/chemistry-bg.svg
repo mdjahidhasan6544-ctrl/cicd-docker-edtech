@@ -1,0 +1,30 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="chemBg" x1="124" y1="74" x2="1138" y2="650" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#082B44"/>
+      <stop offset="1" stop-color="#0E5B74"/>
+    </linearGradient>
+    <linearGradient id="flaskGlow" x1="744" y1="204" x2="952" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#94E1EE" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#59B9D2" stop-opacity="0.48"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" rx="36" fill="url(#chemBg)"/>
+  <circle cx="980" cy="162" r="116" fill="#64BCD6" fill-opacity="0.18"/>
+  <circle cx="256" cy="580" r="152" fill="#7ED7E7" fill-opacity="0.12"/>
+  <path d="M802 164H930" stroke="#D7F5FB" stroke-width="16" stroke-linecap="round"/>
+  <path d="M852 164V278L776 470C756 520 792 574 848 574H884C940 574 976 520 956 470L880 278V164" fill="url(#flaskGlow)" stroke="#E9FBFF" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M792 430H940" stroke="#EAFBFF" stroke-width="10" stroke-linecap="round" opacity="0.72"/>
+  <circle cx="840" cy="372" r="14" fill="#E8FBFF"/>
+  <circle cx="900" cy="334" r="10" fill="#D4F7FF"/>
+  <circle cx="874" cy="404" r="12" fill="#D4F7FF"/>
+  <circle cx="314" cy="248" r="24" fill="#D8F8FE"/>
+  <circle cx="438" cy="326" r="22" fill="#ACE7F2"/>
+  <circle cx="566" cy="232" r="24" fill="#D8F8FE"/>
+  <circle cx="496" cy="462" r="22" fill="#ACE7F2"/>
+  <path d="M332 260L420 314" stroke="#D4F6FD" stroke-width="8" stroke-linecap="round"/>
+  <path d="M456 314L546 248" stroke="#D4F6FD" stroke-width="8" stroke-linecap="round"/>
+  <path d="M438 348L486 438" stroke="#D4F6FD" stroke-width="8" stroke-linecap="round"/>
+  <rect x="156" y="126" width="232" height="86" rx="22" fill="#F6FDFF" fill-opacity="0.08" stroke="#CBEAF7" stroke-opacity="0.36"/>
+  <text x="190" y="181" fill="#F8FDFF" font-size="42" font-family="Arial, sans-serif" font-weight="700">H₂O</text>
+</svg>

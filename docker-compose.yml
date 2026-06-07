@@ -1,0 +1,68 @@
+# =====================================================
+# Docker Compose v2 — Scholastica Stars 3.0
+#
+# This file is INTENDED TO RUN ON THE AWS EC2 INSTANCE
+# (not on the developer's machine). It PULLS pre-built
+# images from Docker Hub and does NOT build locally.
+#
+# Secrets are loaded from a host-side .env file that the
+# CI/CD deploy job writes at deploy time.
+# =====================================================
+
+services:
+  # -----------------------------------------------
+  # React Frontend served by Nginx
+  # -----------------------------------------------
+  frontend:
+    image: ${DOCKER_USERNAME:-scholastica}/mern-frontend:latest
+    container_name: mern-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"                    # Public HTTP
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - mern-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+  # -----------------------------------------------
+  # Express Backend (Node.js)
+  # -----------------------------------------------
+  backend:
+    image: ${DOCKER_USERNAME:-scholastica}/mern-backend:latest
+    container_name: mern-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"                # API (only exposed for debugging — browser hits frontend nginx first)
+    environment:
+      # ---- Required (validated at backend startup) ----
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      # ---- Admin bootstrap ----
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - ADMIN_NAME=${ADMIN_NAME:-Scholastica Admin}
+      # ---- Runtime config ----
+      - NODE_ENV=production
+      - PORT=5000
+      # CORS allowlist — the public URL the SPA is loaded from.
+      # Trailing slash stripped by app.js; comma-separated if multiple.
+      - CLIENT_URL=${CLIENT_URL:-http://localhost}
+    networks:
+      - mern-network
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+# Custom bridge network for inter-service DNS resolution
+networks:
+  mern-network:
+    driver: bridge

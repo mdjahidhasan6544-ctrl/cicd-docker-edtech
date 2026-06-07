@@ -1,0 +1,60 @@
+# ============================================
+# Backend .dockerignore
+# ============================================
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Local dependencies (rebuilt inside the image)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Build outputs (rebuilt inside the image; backend is JS so none yet)
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Secrets and env overrides — must NEVER enter the image
+.env
+.env.*
+!.env.example
+
+# Documentation (not needed in the image)
+*.md
+README.md
+LICENSE
+docs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.history/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tests / coverage
+__tests__/
+__mocks__/
+*.test.js
+*.spec.js
+jest.config.*
+
+# Dev tooling
+.puku/
+
+# Docker files themselves
+Dockerfile
+Dockerfile.*
+.dockerignore
+docker-compose*.yml

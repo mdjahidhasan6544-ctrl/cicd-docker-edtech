@@ -1,0 +1,95 @@
+# ============================================
+# MERN Stack .gitignore
+# Purpose: prevent secret leaks and avoid
+# committing build artifacts / IDE noise
+# ============================================
+
+# ------------------------------------------
+# Environment & secrets  (CRITICAL)
+# ------------------------------------------
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# ------------------------------------------
+# Node.js dependencies
+# ------------------------------------------
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.js
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ------------------------------------------
+# Production build outputs
+# ------------------------------------------
+dist/
+build/
+**/dist/
+**/build/
+.next/
+out/
+.cache/
+.parcel-cache/
+
+# ------------------------------------------
+# Test / coverage
+# ------------------------------------------
+coverage/
+.nyc_output/
+*.lcov
+
+# ------------------------------------------
+# IDE / Editor configurations
+# ------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.history/
+
+# ------------------------------------------
+# Logs
+# ------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ------------------------------------------
+# OS files
+# ------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+$RECYCLE.BIN/
+
+# ------------------------------------------
+# Puku CLI metadata (dev tool, not part of app)
+# ------------------------------------------
+.puku/
+
+# ------------------------------------------
+# Docker local overrides
+# ------------------------------------------
+docker-compose.override.yml
+Dockerfile.dev
+
+# ------------------------------------------
+# Misc
+# ------------------------------------------
+*.tsbuildinfo
+.eslintcache
+.stylelintcache

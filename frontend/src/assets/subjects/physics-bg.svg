@@ -1,0 +1,30 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="physicsBg" x1="126" y1="84" x2="1158" y2="642" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#081F39"/>
+      <stop offset="1" stop-color="#0D4E74"/>
+    </linearGradient>
+    <radialGradient id="orbitGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(882 274) rotate(90) scale(184 250)">
+      <stop stop-color="#8ED6F0" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#8ED6F0" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1280" height="720" rx="36" fill="url(#physicsBg)"/>
+  <circle cx="954" cy="188" r="124" fill="#3D83AF" fill-opacity="0.18"/>
+  <circle cx="286" cy="594" r="170" fill="#73BEDD" fill-opacity="0.12"/>
+  <ellipse cx="830" cy="326" rx="246" ry="126" stroke="#B6E5F5" stroke-width="8"/>
+  <ellipse cx="830" cy="326" rx="170" ry="240" transform="rotate(28 830 326)" stroke="#81CFEA" stroke-width="8" stroke-opacity="0.86"/>
+  <ellipse cx="830" cy="326" rx="170" ry="240" transform="rotate(-34 830 326)" stroke="#D7F4FC" stroke-width="8" stroke-opacity="0.7"/>
+  <circle cx="830" cy="326" r="28" fill="#F7FDFF"/>
+  <circle cx="1038" cy="326" r="16" fill="#A8E2F4"/>
+  <circle cx="704" cy="184" r="16" fill="#A8E2F4"/>
+  <circle cx="734" cy="520" r="16" fill="#D5F2FB"/>
+  <circle cx="912" cy="118" r="16" fill="#D5F2FB"/>
+  <rect x="150" y="138" width="266" height="104" rx="24" fill="#F7FCFF" fill-opacity="0.08" stroke="#CBEAF7" stroke-opacity="0.36"/>
+  <text x="184" y="202" fill="#F8FDFF" font-size="46" font-family="Arial, sans-serif" font-weight="700">F = ma</text>
+  <path d="M204 478H490" stroke="#D7F4FC" stroke-width="12" stroke-linecap="round"/>
+  <path d="M254 428L204 478L254 528" stroke="#D7F4FC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="510" y="430" width="88" height="96" rx="20" fill="#F5FBFE" fill-opacity="0.16" stroke="#D1EEF9" stroke-opacity="0.32"/>
+  <path d="M574 426V344" stroke="#C5EAF8" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="574" cy="570" r="62" fill="url(#orbitGlow)"/>
+</svg>

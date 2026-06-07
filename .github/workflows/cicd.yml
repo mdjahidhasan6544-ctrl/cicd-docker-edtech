@@ -1,0 +1,156 @@
+# =====================================================
+# Scholastica — CI/CD Pipeline
+#
+# Trigger:   push to `main`
+# Job 1:     Build frontend + backend Docker images
+#            and push them to Docker Hub (with caching).
+# Job 2:     Copy docker-compose.yml to the EC2 host,
+#            generate .env from GitHub Secrets, pull
+#            the new images, and restart the stack.
+# =====================================================
+
+name: MERN CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+# Prevent overlapping deploys — if a previous deploy is still
+# running, the new run waits for it to finish.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+# ----------------------------------------------------------------
+# Defaults applied to every step (e.g. shell options)
+# ----------------------------------------------------------------
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  # =================================================
+  # JOB 1 — Build & Push Docker images
+  # =================================================
+  build-and-push:
+    name: Build & Push Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v5
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      # ---- Backend image ----
+      - name: Build & push backend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/mern-backend:latest
+            ${{ secrets.DOCKER_USERNAME }}/mern-backend:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/mern-backend:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/mern-backend:buildcache,mode=max
+
+      # ---- Frontend image ----
+      # VITE_API_URL is injected at build time. Default empty → axiosInstance
+      # uses relative paths and the frontend nginx proxies /api to backend.
+      - name: Build & push frontend image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/mern-frontend:latest
+            ${{ secrets.DOCKER_USERNAME }}/mern-frontend:${{ github.sha }}
+          build-args: |
+            VITE_API_URL=
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/mern-frontend:buildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/mern-frontend:buildcache,mode=max
+
+  # =================================================
+  # JOB 2 — Deploy to AWS EC2
+  # =================================================
+  deploy:
+    name: Deploy to AWS EC2
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v5
+
+      # ---- Securely copy docker-compose.yml to EC2 ----
+      - name: Copy docker-compose.yml to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "~/app"
+          command_timeout: 2m
+
+      # ---- SSH into EC2, generate .env, pull & restart ----
+      - name: Deploy application on EC2
+        uses: appleboy/ssh-action@v1.0.10
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          ADMIN_EMAIL:     ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD:  ${{ secrets.ADMIN_PASSWORD }}
+          MONGO_URI:       ${{ secrets.MONGO_URI }}
+          JWT_SECRET:      ${{ secrets.JWT_SECRET }}
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+            cd ~/app
+
+            # 1) Dynamically generate the .env file with secrets injected by GitHub Actions.
+            #    GitHub auto-masks known secret values in the runner log.
+            #    CLIENT_URL defaults to the EC2 host's public URL so CORS allows the browser origin.
+            cat > .env <<EOF
+            DOCKER_USERNAME=${DOCKER_USERNAME}
+            ADMIN_EMAIL=${ADMIN_EMAIL}
+            ADMIN_PASSWORD=${ADMIN_PASSWORD}
+            MONGO_URI=${MONGO_URI}
+            JWT_SECRET=${JWT_SECRET}
+            CLIENT_URL=http://${EC2_HOST}
+            ADMIN_NAME=Scholastica Admin
+            EOF
+
+            # Tighten permissions on the .env (contains secrets)
+            chmod 600 .env
+
+            # 2) Log in to Docker Hub on the EC2 host
+            echo "${DOCKER_PASSWORD}" | docker login -u "${DOCKER_USERNAME}" --password-stdin
+
+            # 3) Pull the latest images
+            docker compose pull
+
+            # 4) Recreate the stack
+            docker compose up -d --remove-orphans
+
+            # 5) Clean up dangling images to free disk space
+            docker image prune -f
+
+            # 6) Show a quick status snapshot
+            docker compose ps

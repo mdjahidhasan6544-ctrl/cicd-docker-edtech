@@ -1,0 +1,37 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mathBg" x1="112" y1="84" x2="1148" y2="648" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A2745"/>
+      <stop offset="1" stop-color="#174D7A"/>
+    </linearGradient>
+    <linearGradient id="gridGlow" x1="248" y1="146" x2="1034" y2="566" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#84CAE8" stop-opacity="0.62"/>
+      <stop offset="1" stop-color="#D8F1FA" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" rx="36" fill="url(#mathBg)"/>
+  <circle cx="1006" cy="154" r="116" fill="#2D79AE" fill-opacity="0.28"/>
+  <circle cx="264" cy="606" r="150" fill="#6DC4E4" fill-opacity="0.14"/>
+  <g opacity="0.3">
+    <path d="M196 122V618" stroke="#B7E3F3"/>
+    <path d="M316 122V618" stroke="#B7E3F3"/>
+    <path d="M436 122V618" stroke="#B7E3F3"/>
+    <path d="M556 122V618" stroke="#B7E3F3"/>
+    <path d="M676 122V618" stroke="#B7E3F3"/>
+    <path d="M796 122V618" stroke="#B7E3F3"/>
+    <path d="M916 122V618" stroke="#B7E3F3"/>
+    <path d="M1036 122V618" stroke="#B7E3F3"/>
+    <path d="M170 168H1088" stroke="#B7E3F3"/>
+    <path d="M170 288H1088" stroke="#B7E3F3"/>
+    <path d="M170 408H1088" stroke="#B7E3F3"/>
+    <path d="M170 528H1088" stroke="#B7E3F3"/>
+  </g>
+  <path d="M162 520C246 488 318 438 392 384C468 330 534 256 608 222C682 188 758 190 842 248C924 306 980 398 1116 442" stroke="url(#gridGlow)" stroke-width="12" stroke-linecap="round"/>
+  <path d="M234 560L424 278L540 432L676 206L864 486L1046 318" stroke="#E9F8FE" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="424" cy="278" r="18" fill="#D9F5FF"/>
+  <circle cx="540" cy="432" r="18" fill="#D9F5FF"/>
+  <circle cx="676" cy="206" r="18" fill="#D9F5FF"/>
+  <circle cx="864" cy="486" r="18" fill="#D9F5FF"/>
+  <rect x="164" y="110" width="194" height="80" rx="20" fill="#F7FCFF" fill-opacity="0.08" stroke="#CBEAF7" stroke-opacity="0.42"/>
+  <text x="200" y="160" fill="#F5FCFF" font-size="38" font-family="Arial, sans-serif" font-weight="700">x² + y²</text>
+</svg>

@@ -1,0 +1,80 @@
+# ============================================
+# Root .dockerignore
+# Applied to top-level `docker build` contexts.
+# Each app's own .dockerignore is more specific.
+# ============================================
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+.github/
+
+# Local dependencies (rebuilt inside the image)
+**/node_modules/
+**/.pnp
+**/.yarn/
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/coverage/
+**/.nyc_output/
+**/.cache/
+**/.parcel-cache/
+
+# Secrets and environment overrides
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Documentation (not needed in the image)
+*.md
+README.md
+CHANGELOG.md
+LICENSE
+CONTRIBUTING.md
+docs/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.history/
+
+# Test files
+**/__tests__/
+**/__mocks__/
+**/*.test.js
+**/*.test.ts
+**/*.test.jsx
+**/*.test.tsx
+**/*.spec.js
+**/*.spec.ts
+**/jest.config.*
+**/vitest.config.*
+
+# OS / metadata
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Puku CLI / dev tooling
+.puku/
+**/.puku/
+
+# Docker files themselves (avoid recursion)
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+Dockerfile.*
+.dockerignore

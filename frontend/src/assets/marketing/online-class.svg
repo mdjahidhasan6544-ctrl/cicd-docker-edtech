@@ -1,0 +1,36 @@
+<svg width="1280" height="980" viewBox="0 0 1280 980" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="130" y1="80" x2="1120" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FCFEFF"/>
+      <stop offset="1" stop-color="#E8F5FB"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="210" y1="170" x2="1092" y2="716" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#103F5B"/>
+      <stop offset="1" stop-color="#0C628A"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="980" rx="46" fill="url(#bg)"/>
+  <rect x="146" y="128" width="988" height="628" rx="40" fill="url(#screen)"/>
+  <rect x="190" y="176" width="900" height="532" rx="24" fill="#F8FCFF"/>
+  <rect x="246" y="234" width="248" height="182" rx="28" fill="#DCEEF8"/>
+  <circle cx="370" cy="292" r="42" fill="#F0C7A5"/>
+  <path d="M322 278C338 214 410 206 430 280C434 230 410 182 372 182C334 182 308 224 322 278Z" fill="#2D4F69"/>
+  <rect x="316" y="336" width="108" height="54" rx="24" fill="#608DB4"/>
+  <rect x="524" y="234" width="248" height="182" rx="28" fill="#CFE6F4"/>
+  <circle cx="648" cy="292" r="42" fill="#F0C5A1"/>
+  <path d="M598 282C620 218 684 220 698 286C706 236 676 194 646 194C612 194 584 230 598 282Z" fill="#1F405C"/>
+  <rect x="594" y="336" width="108" height="54" rx="24" fill="#7EA9C8"/>
+  <rect x="802" y="234" width="232" height="182" rx="28" fill="#E6F3FA"/>
+  <rect x="844" y="280" width="150" height="18" rx="9" fill="#C8E2EF"/>
+  <rect x="844" y="320" width="116" height="18" rx="9" fill="#DCEEF7"/>
+  <rect x="844" y="360" width="92" height="18" rx="9" fill="#DCEEF7"/>
+  <rect x="246" y="474" width="468" height="16" rx="8" fill="#D6EAF5"/>
+  <rect x="246" y="514" width="340" height="16" rx="8" fill="#E1F1F8"/>
+  <rect x="246" y="554" width="280" height="16" rx="8" fill="#E8F5FB"/>
+  <rect x="784" y="476" width="186" height="92" rx="26" fill="#0F6188"/>
+  <text x="838" y="533" fill="white" font-size="44" font-family="Arial, sans-serif" font-weight="700">LIVE</text>
+  <rect x="810" y="604" width="196" height="18" rx="9" fill="#D6E9F4"/>
+  <rect x="810" y="638" width="150" height="18" rx="9" fill="#E0F0F8"/>
+  <rect x="468" y="764" width="344" height="38" rx="19" fill="#204E6E"/>
+  <rect x="548" y="810" width="184" height="68" rx="28" fill="#2B6388"/>
+</svg>
