@@ -116,7 +116,7 @@ jobs:
 
       # ---- Securely copy docker-compose.yml to EC2 ----
       - name: Copy docker-compose.yml to EC2
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
@@ -127,7 +127,7 @@ jobs:
 
       # ---- SSH into EC2, generate .env, pull & restart ----
       - name: Deploy application on EC2
-        uses: appleboy/ssh-action@v1.0.10
+        uses: appleboy/ssh-action@v1
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
