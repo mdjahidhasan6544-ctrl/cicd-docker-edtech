@@ -52,6 +52,26 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
 
+      # ---- Guard rails: fail fast if a lockfile is missing ----
+      # The Dockerfiles use `npm ci`, which is strict and exits 1 without
+      # a package-lock.json. Catching it here gives a much clearer error
+      # than the one inside Docker buildx.
+      - name: Verify backend lockfile
+        working-directory: ./backend
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "::error::backend/package-lock.json is missing. Run 'npm install' locally and commit it."
+            exit 1
+          fi
+
+      - name: Verify frontend lockfile
+        working-directory: ./frontend
+        run: |
+          if [ ! -f package-lock.json ]; then
+            echo "::error::frontend/package-lock.json is missing. Run 'npm install' locally and commit it."
+            exit 1
+          fi
+
       # ---- Backend image ----
       - name: Build & push backend image
         uses: docker/build-push-action@v7
