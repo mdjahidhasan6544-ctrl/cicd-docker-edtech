@@ -114,6 +114,21 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v5
 
+      # ---- Ensure ~/app exists on EC2 BEFORE scp ----
+      # If ~/app doesn't exist, scp will create ~/app as a FILE, and the
+      # later `cd ~/app` will fail. Create the directory first.
+      - name: Ensure ~/app directory exists on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 1m
+          script: |
+            set -euo pipefail
+            mkdir -p ~/app
+            echo "~/app is ready"
+
       # ---- Securely copy docker-compose.yml to EC2 ----
       - name: Copy docker-compose.yml to EC2
         uses: appleboy/scp-action@v1
@@ -129,6 +144,7 @@ jobs:
       - name: Deploy application on EC2
         uses: appleboy/ssh-action@v1
         env:
+          EC2_HOST:        ${{ secrets.EC2_HOST }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
           ADMIN_EMAIL:     ${{ secrets.ADMIN_EMAIL }}
@@ -142,7 +158,20 @@ jobs:
           command_timeout: 10m
           script: |
             set -euo pipefail
+            # -x prints every command before it runs, so the failing
+            # line is obvious in the GH Actions log.
+            set -x
             cd ~/app
+
+            # 0) Sanity checks — fail with a clear message if prerequisites are missing
+            if ! command -v docker >/dev/null 2>&1; then
+              echo "::error::docker is not installed on the EC2 host"
+              exit 1
+            fi
+            if ! docker compose version >/dev/null 2>&1; then
+              echo "::error::'docker compose' (v2 plugin) is not available on the EC2 host"
+              exit 1
+            fi
 
             # 1) Dynamically generate the .env file with secrets injected by GitHub Actions.
             #    GitHub auto-masks known secret values in the runner log.
